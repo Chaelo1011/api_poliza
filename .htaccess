@@ -1,0 +1,12 @@
+RewriteEngine On
+
+#Para quitar el .php de la ruta y el archivo siga abriendo
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php
+
+#Si la ruta no existe, redirigir al index
+#Si el archivo no existe, redirigir al index
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+?)/?$ index.php?url=$1 [L,QSA]
