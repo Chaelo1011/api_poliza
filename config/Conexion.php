@@ -18,12 +18,24 @@ class Conexion {
             $this->database = $dato['database'];
             $this->port = $dato['port'];
         }
-        $this->conexion = new mysqli($this->server, $this->user, $this->password, $this->database, $this->port);
+        $this->conexion = new mysqli($this->server, $this->user, $this->password, $this->database);
 
         if ( $this->conexion->connect_errno ) {
-            echo "Algo va mal con la conexion";
+            // echo "Algo va mal con la conexion";
+            echo $this->conexion->connect_error;
             die;
         }
+
+        // try {
+
+		// 	$conexion="mysql:host=$this->server;dbname=$this->database";
+		// 	$succes= new PDO($conexion,$this->user,$this->password);
+		// 	$succes->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		// 	// echo "CONECTADO CORRECTAMENTE A LA BASE DE DATOS DESARROLLO<br><br>";
+
+		// } catch(PDOException $error_rms){
+		// 	echo $error_rms->getmessage();
+		// }
     }
 
 
@@ -31,7 +43,9 @@ class Conexion {
     private function datosConexion() 
     {
         $direccion = dirname(__FILE__);
-        $jsondata = file_get_contents($direccion. "/" . "config");
+        //Config windows o config linux
+        // $jsondata = file_get_contents($direccion. "/" . "config"); //Config windows
+        $jsondata = file_get_contents($direccion. "/" . "config1"); //Config linux
         return json_decode($jsondata, true);
 
     }

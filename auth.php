@@ -6,10 +6,9 @@ require_once 'controllers/Respuestas.php';
 //Instanciar las clases que voy a necesitar
 $_Auth = new Auth;
 $_Respuestas = new Respuestas;
-
-
+$method = $_SERVER['REQUEST_METHOD'];
 //Verificar que el metodo de autenticacion sea por POST
-if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+if ( $method == 'POST' ) {
     //Ejecutar la autenticacion
     //Capturo la solicitud post
     $request = file_get_contents('php://input');
@@ -31,6 +30,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
     echo json_encode($datosArray);
 
 } else {
+    //La solicitud no fue realizada usando el metodo POST
     header("Content-Type: application/json;charset=utf-8");
     $error = $_Respuestas->error_405();
     http_response_code($error['result']['error_id']);

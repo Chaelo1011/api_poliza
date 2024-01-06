@@ -33,8 +33,8 @@ class Auth extends Conexion {
                         // echo "Usuario validado";
                         //Creando el token
                         $result = $this->crearToken($datosUsuario[0]["UsuarioId"]);
-
-                        if ($result && $result != 0) {
+                        
+                        if ($result && $result !== 0) {
                             //Devolver el token
                             $response = $_Respuestas->response;
                             $response["result"] = [

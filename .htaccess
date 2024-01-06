@@ -1,4 +1,4 @@
-RewriteEngine On
+RewriteEngine on
 
 #Para quitar el .php de la ruta y el archivo siga abriendo
 RewriteCond %{REQUEST_FILENAME} !-d
