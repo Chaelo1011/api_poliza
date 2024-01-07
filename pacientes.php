@@ -10,16 +10,40 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ( $method == 'GET') {
 
-    // echo "Hola get";
     //Mostrar la lista de pacientes
     // Aqui debo recoger la variable limit para la cantidad de elementos a mostrar
-    if ( isset($_GET['page']) ) {
-        $page = $_GET['page'];
+    if ( isset($_GET['id']) ) {
+        
+        $id = $_GET['id'];
+        $datos = $_Pacientes->getPaciente($id);
+
+        $response = $_Respuestas->response;
+        $response["result"] = $datos;
+
+        header("Content-Type: application/json");
+        http_response_code(200);
+        echo json_encode($response);
+
     } else {
-        $page = null;
+
+        //Recuperar la variable page si es que existe, sino le doy un valor null
+        if ( isset($_GET['page']) ) {
+            $page = $_GET['page'];
+        } else {
+            $page = null;
+        }
+        
+        //No hay problema si le mando page = null, en el modelo le doy un valor por defecto de 1
+        $datos = $_Pacientes->listPacientes($page);
+
+        $response = $_Respuestas->response;
+        $response["result"] = $datos;
+
+        header("Content-Type: application/json");
+        http_response_code(200);
+        echo json_encode($response);
     }
 
-    $_Pacientes->listPacientes($page);
 
     //Tambien puedo recoger un id de un paciente en especifico para mostrarlo solo a el/ella
 

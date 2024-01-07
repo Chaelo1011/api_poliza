@@ -18,10 +18,15 @@ class Pacientes extends Conexion {
         $sql = "SELECT Nombre, FechaNacimiento, Direccion, Telefono, Correo FROM pacientes LIMIT $inicio,$cantidad;";
         $datos = parent::obtenerDatos($sql);
 
-        $response = $_Respuestas->response;
-        $response["result"] = $datos;
-        echo json_encode($response);
-        
+        return $datos;        
 
+    }
+
+    //funcion para obtener solo un paciente (luego sera poliza)
+    public function getPaciente($id) {
+        $sql = "SELECT * FROM pacientes WHERE PacienteId = $id;";
+        $datos = parent::obtenerDatos($sql);
+
+        return $datos;
     }
 }
