@@ -2,6 +2,7 @@
 
 require_once 'config/Conexion.php';
 require_once 'controllers/Respuestas.php';
+require_once 'controllers/Auth.php';
 
 class Pacientes extends Conexion {
 
@@ -16,6 +17,7 @@ class Pacientes extends Conexion {
     private $telefono = '';
     private $fecha_nacimiento = '0000-00-00';
     private $correo = '';
+
 
     //Obtener la lista de los pacientes
     public function listPacientes($page = 1) {
@@ -45,42 +47,59 @@ class Pacientes extends Conexion {
 
     //Funcion para guardar un paciente (luego sera poliza)
     public function post($json) {
+        //3b6d27fd0ec888c8552f21376a2bf307
+        $_Auth = new Auth;
         $_Respuestas = new Respuestas;
         $datos = json_decode($json, true);
-        
-        //Campos requeridos
-        if ( !isset($datos["dni"]) || !isset($datos["nombre"]) || !isset($datos["direccion"]) || !isset($datos["telefono"]) ) {
-            
-            return $_Respuestas->error_400();
 
+        if ( !isset($datos['token']) ) {
+            return $_Respuestas->error_401();
         } else {
             
-            //Recoger campos requeridos
-            $this->dni = $datos['dni'];
-            $this->nombre = $datos['nombre'];
-            $this->direccion = $datos['direccion'];
-            $this->telefono = $datos['telefono'];
+            $_Auth->token = $datos['token'];
+            $tokenExists = $_Auth->getToken();
+            
+            if ( $tokenExists ) {
+                // echo "El token existe";
 
-            //Campos opcionales
-            $this->codigo_postal = isset($datos['codigo_postal']) ? $datos['codigo_postal'] : $this->codigo_postal;
-            $this->genero = isset($datos['genero']) ? $datos['genero'] : $this->genero;
-            $this->fecha_nacimiento = isset($datos['fecha_nacimiento']) ? $datos['fecha_nacimiento'] : $this->fecha_nacimiento;
-            $this->correo = isset($datos['correo']) ? $datos['correo'] : $this->correo;
+                //Campos requeridos
+                if ( !isset($datos["dni"]) || !isset($datos["nombre"]) || !isset($datos["direccion"]) || !isset($datos["telefono"]) ) {
+                    
+                    return $_Respuestas->error_400();
 
-            //Llamar a la funcion guardar
-            $saved = $this->save();
+                } else {
+                    
+                    //Recoger campos requeridos
+                    $this->dni = $datos['dni'];
+                    $this->nombre = $datos['nombre'];
+                    $this->direccion = $datos['direccion'];
+                    $this->telefono = $datos['telefono'];
 
-            //Verificar si se guardó
-            if ( $saved ) {
-                $response = $_Respuestas->response;
-                $response['result'] = ['insertedId' => $saved];
-                return $response;
+                    //Campos opcionales
+                    $this->codigo_postal = isset($datos['codigo_postal']) ? $datos['codigo_postal'] : $this->codigo_postal;
+                    $this->genero = isset($datos['genero']) ? $datos['genero'] : $this->genero;
+                    $this->fecha_nacimiento = isset($datos['fecha_nacimiento']) ? $datos['fecha_nacimiento'] : $this->fecha_nacimiento;
+                    $this->correo = isset($datos['correo']) ? $datos['correo'] : $this->correo;
+
+                    //Llamar a la funcion guardar
+                    $saved = $this->save();
+
+                    //Verificar si se guardó
+                    if ( $saved ) {
+                        $response = $_Respuestas->response;
+                        $response['result'] = ['insertedId' => $saved];
+                        return $response;
+                    } else {
+                        return $_Respuestas->error_500("Hubo un problema al guardar el registro");
+                    }
+
+                }
+
             } else {
-                return $_Respuestas->error_500("Hubo un problema al guardar el registro");
+                return $_Respuestas->error_401("El token es inválido o ha caducado");
             }
-
         }
-
+        
     }
     //proveedor, datos, emision poliza, correo_persona
 
@@ -96,7 +115,6 @@ class Pacientes extends Conexion {
         } else {
             return false;
         }
-
 
     }
 }

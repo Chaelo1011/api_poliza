@@ -5,6 +5,11 @@ require_once 'Respuestas.php';
 
 class Auth extends Conexion {
 
+    private $table = 'usuarios_token';
+    public $token = '';
+    public $token_id = '';
+
+
     public function login($json)
     {
         $_Respuestas = new Respuestas;
@@ -67,7 +72,8 @@ class Auth extends Conexion {
 
 
     //Funcion para buscar el usuario en la base de datos y verificar su existencia
-    private function obtenerDatosUsuarios($usuario) {
+    private function obtenerDatosUsuarios($usuario)
+    {
         $sql = "SELECT UsuarioId, Password, Estado FROM usuarios WHERE Usuario = '$usuario';";
         $datos = parent::obtenerDatos($sql);
 
@@ -80,7 +86,8 @@ class Auth extends Conexion {
 
 
     //Funcion para crear el token y almacenarlo en la base de datos
-    private function crearToken($userId) {
+    private function crearToken($userId)
+    {
         $val = true;
         $token = bin2hex(openssl_random_pseudo_bytes(16,$val));
         $estado = "Activo";
@@ -93,5 +100,42 @@ class Auth extends Conexion {
         } else {
             return 0;
         }
+    }
+
+
+    public function getToken()
+    {
+        
+        $sql = "SELECT TokenId, usuarioId, Estado FROM $this->table WHERE Token = '$this->token' AND Estado = 'Activo';";
+
+        $result = parent::obtenerDatos($sql);
+
+        if ( $result ) {
+            //Setear el token id
+            $this->token_id = $result[0]["TokenId"];
+            //Actualizar el token
+            $this->updateToken();
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+
+    public function updateToken()
+    {
+        $date = date('Y-m-d H:i');
+        $sql = "UPDATE $this->table SET Fecha = '$date' WHERE TokenId = $this->token_id;";
+
+        return $sql;
+
+        $result = parent::affectedRows($sql);
+
+        if ($result >= 1) {
+            return $result;
+        } else {
+            return false;
+        }
+
     }
 }
