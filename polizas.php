@@ -1,10 +1,10 @@
 <?php
 
 require_once 'controllers/Respuestas.php';
-require_once 'controllers/Pacientes.php';
+require_once 'controllers/Polizas.php';
 
 $_Respuestas = new Respuestas();
-$_Pacientes = new Pacientes;
+$Polizas = new Polizas;
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -15,7 +15,7 @@ if ( $method == 'GET') {
     if ( isset($_GET['id']) ) {
         
         $id = $_GET['id'];
-        $datos = $_Pacientes->getPaciente($id);
+        $datos = $Polizas->getPaciente($id);
 
         $response = $_Respuestas->response;
         $response["result"] = $datos;
@@ -34,7 +34,7 @@ if ( $method == 'GET') {
         }
         
         //No hay problema si le mando page = null, en el modelo le doy un valor por defecto de 1
-        $datos = $_Pacientes->listPacientes($page);
+        $datos = $Polizas->listPacientes($page);
 
         $response = $_Respuestas->response;
         $response["result"] = $datos;
@@ -52,7 +52,7 @@ if ( $method == 'GET') {
     $postBody = file_get_contents('php://input');
 
     //Envio los datos al controlador
-    $datos = $_Pacientes->post($postBody);
+    $datos = $Polizas->post($postBody);
     
     //Devolvemos una respuesta
     //Si la respuesta contiene algun error

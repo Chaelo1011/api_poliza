@@ -1,9 +1,9 @@
 {
     "conexion": {
-        "server" : "localhost",
-        "user": "root",
-        "password": "123456",
-        "database": "apirest",
+        "server" : "10.1.0.106",
+        "user": "ZeroSagara",
+        "password": "zerosagara89.*",
+        "database": "ikkidev",
         "port": "3306"
     }
 }

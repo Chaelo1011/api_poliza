@@ -3,7 +3,7 @@
         "server" : "localhost",
         "user": "root",
         "password": "",
-        "database": "apirest",
+        "database": "ikkidev",
         "port": "3306"
     }
 }

@@ -4,19 +4,13 @@ require_once 'config/Conexion.php';
 require_once 'controllers/Respuestas.php';
 require_once 'controllers/Auth.php';
 
-class Pacientes extends Conexion {
+class Polizas extends Conexion {
 
-    private $table = 'pacientes';
+    private $table = 'contrato';
 
-    private $paciente_id = '';
-    private $dni = '';
-    private $nombre = '';
-    private $direccion = '';
-    private $codigo_postal = '';
-    private $genero = '';
-    private $telefono = '';
-    private $fecha_nacimiento = '0000-00-00';
-    private $correo = '';
+    private $id_contrato = '';
+    private $estatus_poliza = '';
+    private $num_contrato = '';
 
 
     //Obtener la lista de los pacientes

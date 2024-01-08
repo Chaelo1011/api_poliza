@@ -9,8 +9,6 @@ $conexion = new Conexion();
 $datos = $conexion->insertedId($query);
 print_r($datos); */
 
-var_dump($conexion);
+//var_dump($conexion);
 
 ?>
-
-hola index

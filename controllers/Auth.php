@@ -31,13 +31,13 @@ class Auth extends Conexion {
                 //Encriptar la contraseña y verificar si es igual
                 $passEncriptada = parent::encriptar($password);
 
-                if ( $passEncriptada == $datosUsuario[0]["Password"] ) {
+                if ( $passEncriptada == $datosUsuario[0]["clave"] ) {
                     // echo "Usuario autenticado";
                     //Verificando que el usuario este activo
-                    if ( $datosUsuario[0]["Estado"] == "Activo" ) {
+                    if ( $datosUsuario[0]["id_estatus_usuario"] == 1 ) {
                         // echo "Usuario validado";
                         //Creando el token
-                        $result = $this->crearToken($datosUsuario[0]["UsuarioId"]);
+                        $result = $this->crearToken($datosUsuario[0]["id_usuario"]);
                         
                         if ($result && $result !== 0) {
                             //Devolver el token
@@ -74,10 +74,10 @@ class Auth extends Conexion {
     //Funcion para buscar el usuario en la base de datos y verificar su existencia
     private function obtenerDatosUsuarios($usuario)
     {
-        $sql = "SELECT UsuarioId, Password, Estado FROM usuarios WHERE Usuario = '$usuario';";
+        $sql = "SELECT id_usuario, clave, id_estatus_usuario FROM usuarios WHERE nick = '$usuario';";
         $datos = parent::obtenerDatos($sql);
 
-        if ( $datos[0]["UsuarioId"] ) {
+        if ( $datos[0]["id_usuario"] ) {
             return $datos;
         } else {
             return 0;
