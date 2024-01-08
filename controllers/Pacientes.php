@@ -5,8 +5,20 @@ require_once 'controllers/Respuestas.php';
 
 class Pacientes extends Conexion {
 
+    private $table = 'pacientes';
+
+    private $paciente_id = '';
+    private $dni = '';
+    private $nombre = '';
+    private $direccion = '';
+    private $codigo_postal = '';
+    private $genero = '';
+    private $telefono = '';
+    private $fecha_nacimiento = '0000-00-00';
+    private $correo = '';
+
+    //Obtener la lista de los pacientes
     public function listPacientes($page = 1) {
-        $_Respuestas = new Respuestas;
         $inicio = 0;
         $cantidad = 100;
 
@@ -15,7 +27,7 @@ class Pacientes extends Conexion {
             $cantidad = $cantidad * $page;
         }
 
-        $sql = "SELECT Nombre, FechaNacimiento, Direccion, Telefono, Correo FROM pacientes LIMIT $inicio,$cantidad;";
+        $sql = "SELECT PacienteId, Nombre, FechaNacimiento, Direccion, Telefono, Correo FROM $this->table LIMIT $inicio,$cantidad;";
         $datos = parent::obtenerDatos($sql);
 
         return $datos;        
@@ -24,9 +36,67 @@ class Pacientes extends Conexion {
 
     //funcion para obtener solo un paciente (luego sera poliza)
     public function getPaciente($id) {
-        $sql = "SELECT * FROM pacientes WHERE PacienteId = $id;";
+        $sql = "SELECT * FROM $this->table WHERE PacienteId = $id;";
         $datos = parent::obtenerDatos($sql);
 
         return $datos;
+    }
+
+
+    //Funcion para guardar un paciente (luego sera poliza)
+    public function post($json) {
+        $_Respuestas = new Respuestas;
+        $datos = json_decode($json, true);
+        
+        //Campos requeridos
+        if ( !isset($datos["dni"]) || !isset($datos["nombre"]) || !isset($datos["direccion"]) || !isset($datos["telefono"]) ) {
+            
+            return $_Respuestas->error_400();
+
+        } else {
+            
+            //Recoger campos requeridos
+            $this->dni = $datos['dni'];
+            $this->nombre = $datos['nombre'];
+            $this->direccion = $datos['direccion'];
+            $this->telefono = $datos['telefono'];
+
+            //Campos opcionales
+            $this->codigo_postal = isset($datos['codigo_postal']) ? $datos['codigo_postal'] : $this->codigo_postal;
+            $this->genero = isset($datos['genero']) ? $datos['genero'] : $this->genero;
+            $this->fecha_nacimiento = isset($datos['fecha_nacimiento']) ? $datos['fecha_nacimiento'] : $this->fecha_nacimiento;
+            $this->correo = isset($datos['correo']) ? $datos['correo'] : $this->correo;
+
+            //Llamar a la funcion guardar
+            $saved = $this->save();
+
+            //Verificar si se guardó
+            if ( $saved ) {
+                $response = $_Respuestas->response;
+                $response['result'] = ['insertedId' => $saved];
+                return $response;
+            } else {
+                return $_Respuestas->error_500("Hubo un problema al guardar el registro");
+            }
+
+        }
+
+    }
+    //proveedor, datos, emision poliza, correo_persona
+
+
+
+    private function save() {
+        $sql = "INSERT INTO $this->table (DNI, Nombre, Direccion, CodigoPostal, Telefono, Genero, FechaNacimiento, Correo) VALUES ('$this->dni', '$this->nombre', '$this->direccion', '$this->codigo_postal', '$this->telefono', '$this->genero', '$this->fecha_nacimiento', '$this->correo');";
+
+        $result = parent::insertedId($sql);
+
+        if($result){
+            return $result;
+        } else {
+            return false;
+        }
+
+
     }
 }

@@ -45,11 +45,26 @@ if ( $method == 'GET') {
     }
 
 
-    //Tambien puedo recoger un id de un paciente en especifico para mostrarlo solo a el/ella
-
 } else if ( $method == 'POST') {
 
-    echo "Hola post";
+    // echo "Hola post";
+    //Recibimos los datos enviados
+    $postBody = file_get_contents('php://input');
+
+    //Envio los datos al controlador
+    $datos = $_Pacientes->post($postBody);
+    
+    //Devolvemos una respuesta
+    //Si la respuesta contiene algun error
+    if ( $datos['result']['error_msg'] ) {
+        header('Content-Type: application/json');
+        http_response_code($datos['result']['error_id']);
+        echo json_encode($datos);
+    } else {
+        //Respuesta sin error
+        echo json_encode($datos);
+    }
+
 
 } else if ( $method == 'PUT') {
 
