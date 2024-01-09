@@ -4,11 +4,11 @@ require_once 'controllers/Respuestas.php';
 require_once 'controllers/Polizas.php';
 
 $_Respuestas = new Respuestas();
-$Polizas = new Polizas;
+$_Polizas = new Polizas();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-if ( $method == 'GET') {
+/* if ( $method == 'GET') {
 
     //Mostrar la lista de pacientes
     // Aqui debo recoger la variable limit para la cantidad de elementos a mostrar
@@ -45,14 +45,15 @@ if ( $method == 'GET') {
     }
 
 
-} else if ( $method == 'POST') {
+} */ 
+if ( $method == 'POST') {
 
     // echo "Hola post";
     //Recibimos los datos enviados
     $postBody = file_get_contents('php://input');
 
     //Envio los datos al controlador
-    $datos = $Polizas->post($postBody);
+    $datos = $_Polizas->post($postBody);
     
     //Devolvemos una respuesta
     //Si la respuesta contiene algun error
@@ -62,11 +63,12 @@ if ( $method == 'GET') {
         echo json_encode($datos);
     } else {
         //Respuesta sin error
-        echo json_encode($datos);
+        print_r($datos);
     }
 
 
-} else if ( $method == 'PUT') {
+}
+/* else if ( $method == 'PUT') {
 
     echo "Hola put";
 
@@ -74,7 +76,8 @@ if ( $method == 'GET') {
 
     echo "Hola delete";
 
-} else {
+}  */
+else {
     //La solicitud no fue realizada usando un metodo valido
     header("Content-Type: application/json;charset=utf-8");
     $error = $_Respuestas->error_405();
