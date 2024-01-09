@@ -45,7 +45,7 @@ class Conexion {
         $direccion = dirname(__FILE__);
         //Config windows o config linux
         // $jsondata = file_get_contents($direccion. "/" . "config"); //Config windows
-        $jsondata = file_get_contents($direccion. "/" . "config"); //Config linux
+        $jsondata = file_get_contents($direccion. "/" . "config1"); //Config linux
         return json_decode($jsondata, true);
 
     }

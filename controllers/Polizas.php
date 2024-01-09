@@ -11,127 +11,41 @@ class Polizas extends Conexion {
     //Contratante de la poliza (el cliente que la va a comprar)
     private $id_contratante = '';
     private $cod_documento = '';
-    //private $cod_surcusal = '1'; //Principal Caracas (esta mal escrito en la bd)
+    private $cod_sucursal = 1; //Principal Caracas
     private $id_estado = '0'; //por asignar
     private $id_ciudad = '0';
     private $id_municipio = '0';
-    private $id_ocupacion = ''; //nullable
-    private $id_actividad_eco = ''; //nullable
     private $datos_contratante = ''; //Es el nombre del contratante
 	private $direc = '';
 	private $cedula_rif = '';
 	private $telef1 = '';
 	private $telef2 = '00000000000';
 	private $email = '';
-	private $email_contreembolso = ''; //nullable
-	private $zona_postal = ''; //nullable
-	//private $status = 1; //Creo que este es activo
 
     //Plan (configuracion_plan)
     private $cod_detConfContrato = ''; //id del plan para traerme el resto de la informacion
-    //private $fecha_desde = date('Y-m-d');
-
-    //Versiones_plan
-    private $id_version = '';
-	private $cod_detconfcontrato = '';
-	private $id_moneda = '';
-	private $id_tipo_agotamiento = '';
-	private $num_ren = '';
-	private $num_version = '';
-	private $tipo_prima = '';
-	private $dias_declarar = '';
-	private $comision_inter = '';
-	private $comision_sm = '';
-	private $desde = '';
-	private $hasta = '';
-	private $fecha_efectiva = '';
-	//private $status = '';
-	private $alias = '';
-	private $fec_registro = '';
 
     //Plan contratante
     private $id_plan_contratante = '';
-	//private $cod_detconfcontrato = ''; //id del plan
-	//private $id_contratante = ''; //id del nuevo contratante
-	private $status_plan_contratante = '1'; // 1: poliza emitida, 2: poliza no emitida 
-	private $status = '1';
-	//private $fec_registro = ''; //Fecha de hoy
+	private $status_plan_contratante = '1'; // 1: poliza emitida, 2: poliza no emitida
 
     //Poliza (se llenaran cuando se cree la nueva poliza)
     private $id_contrato = '';
     private $estatus_poliza = '2'; // 1: val, 2: act, 3: mod, 4: ren, 5: anu, 6: web
     private $num_contrato = '';
-    //private $fec_registro = ''; // fecha de hoy
 
     //Versiones contrato
     private $id_version_cont = '';
-	//private $num_ren = '0'; //Poliza no renovada, apenas se esta creando
-	//private $id_contrato = '';
-	//private $id_plan_contratante = '';
-	private $cod_intermediario = ''; //El id del tipo que quiere vender las polizas
-	private $cod_sucursal = 1; //Principal Caracas
+	private $num_ren = '0'; //Poliza no renovada, apenas se esta creando
+	private $cod_intermediario = '2'; //El id del tipo que quiere vender las polizas
+    //Julia Soledad Garcia del Valle
+	
 	private $fecdesde = ''; //fecha de hoy
 	private $fechasta = ''; //Un año despues de la fecha desde
 	private $cod_tipo_forma_pago = ''; //1: anual, 2: mensual, 3: bimestral, 4: trimestral, 5: cuatrimestral, 6: semestral
 	private $prima = 'UNICA'; //creo
-	private $sobregiro = ''; //nullable
-	private $estatus = ''; // 1: activo, 2: cerrado, 3: editable
+	private $estatus_version = '1'; // 1: activo, 2: cerrado, 3: editable
 
-    
-
-    
-
-    /* Ejemplo:
-    {
-        "document_id" : "123456", "sex" : "M" ,
-        "type_fee" : "1",
-        "sum_assured" : "15" ,
-        "country" : "VE" ,
-        "names" : "Luis enrique" ,
-        "surnames" : "Perez" ,
-        "birth_date" : "1990-09-10",
-        "id_insurance" : "3",
-        "email" : "prueba@lamundial.com",
-        "phones" : "1234567820",
-        "transaction_code" : "5214",
-        "transaction_result" : "Realizada",
-        "transaction_id" : "123458",
-        "transaction_msg" : "Realizada",
-        "transaction_ammount" : "12.00",
-        "transaction_currency" : "USD"
-    } */
-
-
-
-
-
-
-
-
-    //Obtener la lista de los pacientes
-    // public function listPacientes($page = 1) {
-    //     $inicio = 0;
-    //     $cantidad = 100;
-
-    //     if ( $page > 1 ) {
-    //         $inicio = $cantidad * ($page -1) + 1;
-    //         $cantidad = $cantidad * $page;
-    //     }
-
-    //     $sql = "SELECT PacienteId, Nombre, FechaNacimiento, Direccion, Telefono, Correo FROM $this->table LIMIT $inicio,$cantidad;";
-    //     $datos = parent::obtenerDatos($sql);
-
-    //     return $datos;        
-
-    // }
-
-    // //funcion para obtener solo un paciente (luego sera poliza)
-    // public function getPaciente($id) {
-    //     $sql = "SELECT * FROM $this->table WHERE PacienteId = $id;";
-    //     $datos = parent::obtenerDatos($sql);
-
-    //     return $datos;
-    // }
 
 
     //Funcion para guardar un paciente (luego sera poliza)
@@ -160,7 +74,8 @@ class Polizas extends Conexion {
                     !isset($datos["telefono"]) ||
                     !isset($datos["direccion"]) || 
                     !isset($datos["fecha_desde"]) ||
-                    !isset($datos["fecha_hasta"])
+                    !isset($datos["fecha_hasta"]) ||
+                    !isset($datos["forma_pago"])
                 ) {
                     
                     return $_Respuestas->error_400();
@@ -170,29 +85,14 @@ class Polizas extends Conexion {
                     //Recoger campos requeridos
                     $this->cod_documento = $datos['cod_documento'];
                     $this->cedula_rif = $datos['cedula_rif'];
-                    $this->datos_contratante = $datos['nombre'];
+                    $this->datos_contratante = strtoupper($datos['nombre']);
                     $this->email = $datos['email'];
                     $this->telef1 = $datos['telefono'];
                     $this->direc = $datos['direccion'];
                     $this->fecdesde = $datos['fecha_desde'];
                     $this->fechasta = $datos['fecha_hasta'];
+                    $this->cod_tipo_forma_pago = $datos["forma_pago"];
 
-                    // return [
-                    //     $this->cod_documento,
-                    //     $this->cedula_rif,
-                    //     $this->datos_contratante,
-                    //     $this->email,
-                    //     $this->telef1,
-                    //     $this->direc,
-                    //     $this->fecdesde,
-                    //     $this->fechasta
-                    // ];
-
-                    // //Campos opcionales
-                    // $this->codigo_postal = isset($datos['codigo_postal']) ? $datos['codigo_postal'] : $this->codigo_postal;
-                    // $this->genero = isset($datos['genero']) ? $datos['genero'] : $this->genero;
-                    // $this->fecha_nacimiento = isset($datos['fecha_nacimiento']) ? $datos['fecha_nacimiento'] : $this->fecha_nacimiento;
-                    // $this->correo = isset($datos['correo']) ? $datos['correo'] : $this->correo;
 
                     //Llamar a la funcion guardar
                     return $this->save();
@@ -214,10 +114,9 @@ class Polizas extends Conexion {
         }
         
     }
-    //proveedor, datos, emision poliza, correo_persona
 
 
-
+    
     private function save() {
         $_Respuestas = new Respuestas();
 
@@ -253,10 +152,8 @@ class Polizas extends Conexion {
 
             if ( !$polizaExists[0]['polizas_activas'] > 0 ) {
                 //Crea la poliza
-                return [$this->savePlanContratante()];
+                return $this->savePlanContratante();
                 
-
-
             } else {
                 //Tiene poliza
                 return $_Respuestas->error_200("El contratante ya tiene una póliza activa");
@@ -273,6 +170,7 @@ class Polizas extends Conexion {
                 //Creo la poliza
                 $this->id_contratante = $registrado;
 
+                return $this->savePlanContratante();
 
             } else {
                 //error 500
@@ -280,18 +178,6 @@ class Polizas extends Conexion {
             }
             
         }
-
-
-
-        // $sql = "INSERT INTO $this->table (DNI, Nombre, Direccion, CodigoPostal, Telefono, Genero, FechaNacimiento, Correo) VALUES ('$this->dni', '$this->nombre', '$this->direccion', '$this->codigo_postal', '$this->telefono', '$this->genero', '$this->fecha_nacimiento', '$this->correo');";
-
-        // $result = parent::insertedId($sql);
-
-        // if($result){
-        //     return $result;
-        // } else {
-        //     return false;
-        // }
 
     }
 
@@ -315,8 +201,7 @@ class Polizas extends Conexion {
         //Asigno el plan manualmente
         $this->cod_detConfContrato = 11; //Plan ZERO
         //Insert
-        $sql = "INSERT INTO plan_contratante (cod_detconfcontrato, id_contratante, status_plan_contratante, status, fec_registro) VALUES ('$this->cod_detConfContrato', '$this->id_contratante', '$this->status_plan_contratante', '1', '$this->fecdesde');";
-        
+        $sql = "INSERT INTO plan_contratante (cod_detconfcontrato, id_contratante, status_plan_contratante, status) VALUES ('$this->cod_detConfContrato', '$this->id_contratante', '$this->status_plan_contratante', '1');";
         
         $nuevo_plan_contratante = parent::insertedId($sql);
         
@@ -327,20 +212,77 @@ class Polizas extends Conexion {
             //LUEGO CREO EL CONTRATO
 
             //Tengo que consultar el ultimo numero de poliza para poder asignarle uno al nuevo registro
+            $sql = "SELECT num_contrato FROM contrato WHERE num_contrato is not null order by num_contrato DESC limit 1;";
+
+            $ultimo_num = parent::obtenerDatos($sql);
+
+            if (!$ultimo_num[0]['num_contrato']) {
+                //Retorna un error 500
+                return false;
+            } else {
+                $numero = $ultimo_num[0]['num_contrato'] + 1;
+                $this->num_contrato = $numero;
+            }
 
 
-            //$sql = "INSERT INTO contrato (cod_estatus_poliza, num_contrato, fec_registro) VALUES ('$this->estatus_poliza', '$this->num_contrato', '$this->fecdesde');";
+            //Creo el nuevo contrato
+            $sql = "INSERT INTO contrato (cod_estatus_poliza, num_contrato) VALUES ('$this->estatus_poliza', '$this->num_contrato');";
 
+            $nuevo_contrato = parent::insertedId($sql);
+            
+            if ( $nuevo_contrato > 0 ) {
+                //Se registro el contrato, ahora creo la version del contrato
+
+                //LUEGO CREO LA VERSION DEL CONTRATO
+                $this->id_contrato = $nuevo_contrato;
+
+                $sql = "INSERT INTO versiones_contrato(
+                            num_ren,
+                            id_contrato,
+                            id_plan_contratante,
+                            cod_intermediario,
+                            cod_sucursal,
+                            fecdesde,
+                            fechasta,
+                            cod_tipo_forma_pago,
+                            prima,
+                            estatus
+                        )
+                        VALUES(
+                            '$this->num_ren',
+                            '$this->id_contrato',
+                            '$this->id_plan_contratante',
+                            '$this->cod_intermediario',
+                            '$this->cod_sucursal',
+                            '$this->fecdesde',
+                            '$this->fechasta',
+                            '$this->cod_tipo_forma_pago',
+                            '$this->prima',
+                            '$this->estatus_version'
+                        );";    
+
+                $nueva_version = parent::insertedId($sql);
+
+                if ( $nueva_version > 0 ) {
+                    // Manda el correo
+                    //Funcion para mandar el correo
+                    return [$this->id_contratante, $nuevo_plan_contratante, $nuevo_contrato, $nueva_version];
+
+                } else {
+                    //Retorna un error 500
+                    return false;
+                }
+
+            } else {
+                //Retorna un error 500
+                return false;
+            }
 
         } else {
             //No se pudo guardar el nuevo plan_contratante
+            //Retorna un error 500
             return false;
         }
-
-
-
-
-        //LUEGO CREO LA VERSION DEL CONTRATO
 
     }
 
