@@ -59,7 +59,7 @@ class Polizas extends Conexion {
 
     //Poliza (se llenaran cuando se cree la nueva poliza)
     private $id_contrato = '';
-    private $estatus_poliza = ''; // 1: val, 2: act, 3: mod, 4: ren, 5: anu, 6: web
+    private $estatus_poliza = '2'; // 1: val, 2: act, 3: mod, 4: ren, 5: anu, 6: web
     private $num_contrato = '';
     //private $fec_registro = ''; // fecha de hoy
 
@@ -253,8 +253,8 @@ class Polizas extends Conexion {
 
             if ( !$polizaExists[0]['polizas_activas'] > 0 ) {
                 //Crea la poliza
-                return ["Creando la poliza"];
-
+                return [$this->savePlanContratante()];
+                
 
 
             } else {
@@ -266,8 +266,18 @@ class Polizas extends Conexion {
 
         } else {
             // return ['No existe, registrar'];
-            return [$this->saveContratante()];
             //registrar ese contratante
+            $registrado = $this->saveContratante();
+
+            if ( $registrado ) {
+                //Creo la poliza
+                $this->id_contratante = $registrado;
+
+
+            } else {
+                //error 500
+                return $_Respuestas->error_500("No se pudo registrar el nuevo contratante");
+            }
             
         }
 
@@ -289,11 +299,48 @@ class Polizas extends Conexion {
     private function saveContratante() {
         $sql = "INSERT INTO contratante (cod_documento, cod_surcusal, id_estado, id_ciudad, id_municipio, datos_contratante, direc, cedula_rif, telef1, telef2, email, status) VALUES ('$this->cod_documento', '$this->cod_sucursal', '$this->id_estado', '$this->id_ciudad', '$this->id_municipio', '$this->datos_contratante', '$this->direc', '$this->cedula_rif', '$this->telef1', '$this->telef2', '$this->email', '1' );";
 
-        return $sql;
+        $nuevo_contratante = parent::insertedId($sql);
+
+        if ( $nuevo_contratante > 0 ) {
+            return $nuevo_contratante;
+        } else {
+            return false;
+        }
+
     }
 
 
     private function savePlanContratante() {
+        //CREO EL PLAN CONTRATANTE
+        //Asigno el plan manualmente
+        $this->cod_detConfContrato = 11; //Plan ZERO
+        //Insert
+        $sql = "INSERT INTO plan_contratante (cod_detconfcontrato, id_contratante, status_plan_contratante, status, fec_registro) VALUES ('$this->cod_detConfContrato', '$this->id_contratante', '$this->status_plan_contratante', '1', '$this->fecdesde');";
+        
+        
+        $nuevo_plan_contratante = parent::insertedId($sql);
+        
+        if ( $nuevo_plan_contratante > 0 ) {
+            //Guardo el nuevo id que acabo de insertar
+            $this->id_plan_contratante = $nuevo_plan_contratante;
+
+            //LUEGO CREO EL CONTRATO
+
+            //Tengo que consultar el ultimo numero de poliza para poder asignarle uno al nuevo registro
+
+
+            //$sql = "INSERT INTO contrato (cod_estatus_poliza, num_contrato, fec_registro) VALUES ('$this->estatus_poliza', '$this->num_contrato', '$this->fecdesde');";
+
+
+        } else {
+            //No se pudo guardar el nuevo plan_contratante
+            return false;
+        }
+
+
+
+
+        //LUEGO CREO LA VERSION DEL CONTRATO
 
     }
 
